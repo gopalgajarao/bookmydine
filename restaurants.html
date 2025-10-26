@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and book tables at the best restaurants. Reserve your table now!">
+    <title>Restaurants - BookMyDine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 30px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select.search-input {
+            cursor: pointer;
+        }
+
+        .search-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Filters */
+        .filters {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            padding: 8px 20px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .filter-tag:hover, .filter-tag.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .results-count {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .sort-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* Restaurant Grid */
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .restaurant-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .restaurant-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .restaurant-info {
+            padding: 20px;
+        }
+
+        .restaurant-name {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .restaurant-cuisine {
+            color: #888;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .restaurant-details {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Commented out - Rating, Price, Distance styles */
+        /*
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        */
+
+        .restaurant-tags {
+            display: flex;
+            gap: 8px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .restaurant-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                display: flex;
+                gap: 15px;
+            }
+
+            nav a {
+                margin: 0;
+            }
+
+            .restaurant-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                min-width: 100%;
+            }
+
+            .results-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .restaurant-image {
+                height: 100px;
+                font-size: 2em;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">🍽️ BookMyDine</div>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="restaurants.html">Restaurants</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search restaurants, cuisines..." id="searchInput">
+                <select class="search-input" id="locationSelect">
+                    <option value="">Select Location</option>
+                    <option value="vijayawada">Vijayawada</option>
+                    <option value="hyderabad">Hyderabad</option>
+                    <option value="bangalore">Bangalore</option>
+                    <option value="chennai">Chennai</option>
+                    <option value="mumbai">Mumbai</option>
+                    <option value="delhi">Delhi</option>
+                </select>
+                <button class="search-btn" onclick="searchRestaurants()">🔍 Search</button>
+            </div>
+            <div class="filters">
+                <div class="filter-tag" onclick="filterCuisine('all')">All</div>
+                <div class="filter-tag" onclick="filterCuisine('north-indian')">North Indian</div>
+                <div class="filter-tag" onclick="filterCuisine('south-indian')">South Indian</div>
+                <div class="filter-tag" onclick="filterCuisine('chinese')">Chinese</div>
+                <div class="filter-tag" onclick="filterCuisine('italian')">Italian</div>
+                <div class="filter-tag" onclick="filterCuisine('continental')">Continental</div>
+                <div class="filter-tag" onclick="filterCuisine('biryani')">Biryani</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="results-header">
+            <div class="results-count" id="resultsCount">Showing 12 restaurants</div>
+            <select class="sort-select" id="sortSelect" onchange="sortRestaurants()">
+                <option value="rating">Sort by Rating</option>
+                <option value="name">Sort by Name</option>
+                <!-- Commented out price sorting options -->
+                <!-- <option value="price-low">Price: Low to High</option> -->
+                <!-- <option value="price-high">Price: High to Low</option> -->
+            </select>
+        </div>
+
+        <div class="restaurant-grid" id="restaurantGrid">
+            <!-- Restaurants will be loaded here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 BookMyDine. All rights reserved.</p>
+        <p style="margin-top: 10px;">📧 contact@bookmydine.co.in | 💼 partnerships@bookmydine.co.in</p>
+    </footer>
+
+    <script>
+        // Sample restaurant data
+        const restaurants = [
+            {
+                id: 1,
+                name: "Spice Garden",
+                cuisine: "North Indian, Mughlai",
+                rating: 4.5,  // Commented out in display
+                price: "₹₹",  // Commented out in display
+                location: "Vijayawada",
+                distance: "2.5 km",  // Commented out in display
+                featured: true,
+                tags: ["Outdoor Seating", "Family Friendly", "Live Music"],
+                emoji: "🍛"
+            },
+            {
+                id: 2,
+                name: "Dosa Corner",
+                cuisine: "South Indian, Breakfast",
+                rating: 4.3,
+                price: "₹",
+                location: "Vijayawada",
+                distance: "1.2 km",
+                featured: false,
+                tags: ["Quick Service", "Vegetarian", "Breakfast"],
+                emoji: "🥞"
+            },
+            {
+                id: 3,
+                name: "Golden Dragon",
+                cuisine: "Chinese, Asian",
+                rating: 4.6,
+                price: "₹₹₹",
+                location: "Vijayawada",
+                distance: "3.8 km",
+                featured: true,
+                tags: ["Delivery", "Valet Parking", "Bar Available"],
+                emoji: "🥡"
+            },
+            {
+                id: 4,
+                name: "Pasta Paradise",
+                cuisine: "Italian, Continental",
+                rating: 4.4,
+                price: "₹₹₹",
+                location: "Hyderabad",
+                distance: "4.5 km",
+                featured: false,
+                tags: ["Romantic", "Wine & Dine", "Pet Friendly"],
+                emoji: "🍝"
+            },
+            {
+                id: 5,
+                name: "Biryani House",
+                cuisine: "Biryani, Hyderabadi",
+                rating: 4.7,
+                price: "₹₹",
+                location: "Hyderabad",
+                distance: "1.8 km",
+                featured: true,
+                tags: ["Takeaway", "Popular", "Spicy"],
+                emoji: "🍚"
+            },
+            {
+                id: 6,
+                name: "The Green Bowl",
+                cuisine: "Healthy, Salads",
+                rating: 4.2,
+                price: "₹₹",
+                location: "Bangalore",
+                distance: "2.1 km",
+                featured: false,
+                tags: ["Vegan Options", "Organic", "Healthy"],
+                emoji: "🥗"
+            },
+            {
+                id: 7,
+                name: "Tandoor Nights",
+                cuisine: "North Indian, BBQ",
+                rating: 4.5,
+                price: "₹₹₹",
+                location: "Delhi",
+                distance: "3.2 km",
+                featured: true,
+                tags: ["Rooftop", "Live Grill", "Party Hall"],
+                emoji: "🍢"
+            },
+            {
+                id: 8,
+                name: "Coastal Kitchen",
+                cuisine: "Seafood, Coastal",
+                rating: 4.4,
+                price: "₹₹₹",
+                location: "Chennai",
+                distance: "5.5 km",
+                featured: false,
+                tags: ["Fresh Catch", "Beachside", "AC"],
+                emoji: "🦞"
+            },
+            {
+                id: 9,
+                name: "Cafe Mocha",
+                cuisine: "Cafe, Desserts",
+                rating: 4.3,
+                price: "₹₹",
+                location: "Mumbai",
+                distance: "1.5 km",
+                featured: false,
+                tags: ["WiFi", "Coffee", "Cozy"],
+                emoji: "☕"
+            },
+            {
+                id: 10,
+                name: "Royal Thali",
+                cuisine: "Rajasthani, Thali",
+                rating: 4.6,
+                price: "₹₹",
+                location: "Bangalore",
+                distance: "2.8 km",
+                featured: true,
+                tags: ["Unlimited", "Traditional", "AC"],
+                emoji: "🍽️"
+            },
+            {
+                id: 11,
+                name: "Burger Junction",
+                cuisine: "Fast Food, American",
+                rating: 4.1,
+                price: "₹",
+                location: "Vijayawada",
+                distance: "0.8 km",
+                featured: false,
+                tags: ["Quick Bites", "Delivery", "Kids Menu"],
+                emoji: "🍔"
+            },
+            {
+                id: 12,
+                name: "Sushi Samurai",
+                cuisine: "Japanese, Sushi",
+                rating: 4.8,
+                price: "₹₹₹₹",
+                location: "Mumbai",
+                distance: "6.2 km",
+                featured: true,
+                tags: ["Premium", "Authentic", "Chef Special"],
+                emoji: "🍣"
+            }
+        ];
+
+        // Display restaurants
+        function displayRestaurants(restaurantList) {
+            const grid = document.getElementById('restaurantGrid');
+            grid.innerHTML = '';
+
+            restaurantList.forEach(restaurant => {
+                const card = document.createElement('div');
+                card.className = 'restaurant-card';
+                card.innerHTML = `
+                    <div class="restaurant-image">
+                        <span style="font-size: 2.5em;">${restaurant.emoji}</span>
+                        ${restaurant.featured ? '<div class="badge">⭐ Featured</div>' : ''}
+                    </div>
+                    <div class="restaurant-info">
+                        <div class="restaurant-name">${restaurant.name}</div>
+                        <div class="restaurant-cuisine">${restaurant.cuisine}</div>
+                        
+                        <!-- Commented out: Rating, Price, Distance section -->
+                        <!--
+                        <div class="restaurant-details">
+                            <div class="rating">${restaurant.rating} ⭐</div>
+                            <div class="detail-item">💰 ${restaurant.price}</div>
+                            <div class="detail-item">📍 ${restaurant.distance}</div>
+                        </div>
+                        -->
+                        
+                        <div class="restaurant-tags">
+                            ${restaurant.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <div class="restaurant-actions">
+                            <button class="btn btn-primary" onclick="bookTable(${restaurant.id})">📅 Book Table</button>
+                            <button class="btn btn-secondary" onclick="orderFood(${restaurant.id})">🛒 Order Food</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('resultsCount').textContent = `Showing ${restaurantList.length} restaurant${restaurantList.length !== 1 ? 's' : ''}`;
+        }
+
+        // Search functionality
+        function searchRestaurants() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const location = document.getElementById('locationSelect').value.toLowerCase();
+
+            let filtered = restaurants;
+
+            if (searchTerm) {
+                filtered = filtered.filter(r => 
+                    r.name.toLowerCase().includes(searchTerm) || 
+                    r.cuisine.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (location) {
+                filtered = filtered.filter(r => r.location.toLowerCase() === location);
+            }
+
+            displayRestaurants(filtered);
+        }
+
+        // Filter by cuisine
+        function filterCuisine(cuisine) {
+            const tags = document.querySelectorAll('.filter-tag');
+            tags.forEach(tag => tag.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (cuisine === 'all') {
+                displayRestaurants(restaurants);
+            } else {
+                const filtered = restaurants.filter(r => 
+                    r.cuisine.toLowerCase().includes(cuisine)
+                );
+                displayRestaurants(filtered);
+            }
+        }
+
+        // Sort restaurants
+        function sortRestaurants() {
+            const sortBy = document.getElementById('sortSelect').value;
+            let sorted = [...restaurants];
+
+            switch(sortBy) {
+                case 'rating':
+                    sorted.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'name':
+                    sorted.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                // Commented out price sorting
+                /*
+                case 'price-low':
+                    sorted.sort((a, b) => a.price.length - b.price.length);
+                    break;
+                case 'price-high':
+                    sorted.sort((a, b) => b.price.length - a.price.length);
+                    break;
+                */
+            }
+
+            displayRestaurants(sorted);
+        }
+
+        // Actions
+        function bookTable(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            alert(`🎉 Booking table at ${restaurant.name}!\n\nThis feature will be available in the mobile app.`);
+        }
+
+        function orderFood(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            alert(`🍕 Ordering from ${restaurant.name}!\n\nThis feature will be available in the mobile app.`);
+        }
+
+        // Initialize
+        displayRestaurants(restaurants);
+
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchRestaurants();
+            }
+        });
+    </script>
+</body>
+</html>
